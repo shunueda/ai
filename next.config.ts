@@ -2,7 +2,8 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   experimental: {
-    ppr: true
+    ppr: true,
+    typedEnv: true
   },
   images: {
     remotePatterns: [

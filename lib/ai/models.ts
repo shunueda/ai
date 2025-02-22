@@ -35,5 +35,9 @@ export const chatModels: Array<ChatModel> = [
   {
     id: ModelId.OPENAI_O3_MINI,
     description: 'Fast at advanced reasoning'
+  },
+  {
+    id: ModelId.OPENAI_4O_ONLINE,
+    description: 'Online model for real-time responses'
   }
 ]
