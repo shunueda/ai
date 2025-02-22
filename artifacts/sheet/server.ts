@@ -1,78 +1,79 @@
-import { myProvider } from '@/lib/ai/models';
-import { sheetPrompt, updateDocumentPrompt } from '@/lib/ai/prompts';
-import { createDocumentHandler } from '@/lib/artifacts/server';
-import { streamObject } from 'ai';
-import { z } from 'zod';
+import { myProvider } from '@/lib/ai/models'
+import { sheetPrompt, updateDocumentPrompt } from '@/lib/ai/prompts'
+import { createDocumentHandler } from '@/lib/artifacts/server'
+import { streamObject } from 'ai'
+import { z } from 'zod'
+import { ModelId } from '@/lib/ai/model-id'
 
 export const sheetDocumentHandler = createDocumentHandler<'sheet'>({
   kind: 'sheet',
   onCreateDocument: async ({ title, dataStream }) => {
-    let draftContent = '';
+    let draftContent = ''
 
     const { fullStream } = streamObject({
-      model: myProvider.languageModel('artifact-model'),
+      model: myProvider.languageModel(ModelId.ARTIFACT_MODEL),
       system: sheetPrompt,
       prompt: title,
       schema: z.object({
-        csv: z.string().describe('CSV data'),
-      }),
-    });
+        csv: z.string().describe('CSV data')
+      })
+    })
 
     for await (const delta of fullStream) {
-      const { type } = delta;
+      const { type } = delta
 
       if (type === 'object') {
-        const { object } = delta;
-        const { csv } = object;
+        const { object } = delta
+        const { csv } = object
 
         if (csv) {
           dataStream.writeData({
             type: 'sheet-delta',
-            content: csv,
-          });
+            content: csv
+          })
 
-          draftContent = csv;
+          draftContent = csv
         }
       }
     }
 
     dataStream.writeData({
       type: 'sheet-delta',
-      content: draftContent,
-    });
+      content: draftContent
+    })
 
-    return draftContent;
+    return draftContent
   },
   onUpdateDocument: async ({ document, description, dataStream }) => {
-    let draftContent = '';
+    let draftContent = ''
 
     const { fullStream } = streamObject({
-      model: myProvider.languageModel('artifact-model'),
+      model: myProvider.languageModel(ModelId.ARTIFACT_MODEL),
       system: updateDocumentPrompt(document.content, 'sheet'),
       prompt: description,
       schema: z.object({
-        csv: z.string(),
-      }),
-    });
+        csv: z.string()
+      })
+    })
 
     for await (const delta of fullStream) {
-      const { type } = delta;
+      const { type } = delta
 
       if (type === 'object') {
-        const { object } = delta;
-        const { csv } = object;
+        const { object } = delta
+        const { csv } = object
 
         if (csv) {
           dataStream.writeData({
             type: 'sheet-delta',
-            content: csv,
-          });
+            content: csv
+          })
 
-          draftContent = csv;
+          draftContent = csv
         }
       }
     }
 
-    return draftContent;
-  },
-});
+    return draftContent
+  }
+})

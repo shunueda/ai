@@ -1,45 +1,45 @@
-'use client';
+'use client'
 
-import cx from 'classnames';
-import { format, isWithinInterval } from 'date-fns';
-import { useEffect, useState } from 'react';
+import cx from 'classnames'
+import { format, isWithinInterval } from 'date-fns'
+import { useEffect, useState } from 'react'
 
 interface WeatherAtLocation {
-  latitude: number;
-  longitude: number;
-  generationtime_ms: number;
-  utc_offset_seconds: number;
-  timezone: string;
-  timezone_abbreviation: string;
-  elevation: number;
+  latitude: number
+  longitude: number
+  generationtime_ms: number
+  utc_offset_seconds: number
+  timezone: string
+  timezone_abbreviation: string
+  elevation: number
   current_units: {
-    time: string;
-    interval: string;
-    temperature_2m: string;
-  };
+    time: string
+    interval: string
+    temperature_2m: string
+  }
   current: {
-    time: string;
-    interval: number;
-    temperature_2m: number;
-  };
+    time: string
+    interval: number
+    temperature_2m: number
+  }
   hourly_units: {
-    time: string;
-    temperature_2m: string;
-  };
+    time: string
+    temperature_2m: string
+  }
   hourly: {
-    time: string[];
-    temperature_2m: number[];
-  };
+    time: string[]
+    temperature_2m: number[]
+  }
   daily_units: {
-    time: string;
-    sunrise: string;
-    sunset: string;
-  };
+    time: string
+    sunrise: string
+    sunset: string
+  }
   daily: {
-    time: string[];
-    sunrise: string[];
-    sunset: string[];
-  };
+    time: string[]
+    sunrise: string[]
+    sunset: string[]
+  }
 }
 
 const SAMPLE = {
@@ -154,7 +154,7 @@ const SAMPLE = {
       '2024-10-11T00:00',
       '2024-10-11T01:00',
       '2024-10-11T02:00',
-      '2024-10-11T03:00',
+      '2024-10-11T03:00'
     ],
     temperature_2m: [
       36.6, 32.8, 29.5, 28.6, 29.2, 28.2, 27.5, 26.6, 26.5, 26, 25, 23.5, 23.9,
@@ -164,13 +164,13 @@ const SAMPLE = {
       17, 16.7, 16.2, 15.6, 15.2, 15, 15, 15.1, 14.8, 14.8, 14.9, 14.7, 14.8,
       15.3, 16.2, 17.9, 19.6, 20.5, 21.6, 21, 20.7, 19.3, 18.7, 18.4, 17.9,
       17.3, 17, 17, 16.8, 16.4, 16.2, 16, 15.8, 15.7, 15.4, 15.4, 16.1, 16.7,
-      17, 18.6, 19, 19.5, 19.4, 18.5, 17.9, 17.5, 16.7, 16.3, 16.1,
-    ],
+      17, 18.6, 19, 19.5, 19.4, 18.5, 17.9, 17.5, 16.7, 16.3, 16.1
+    ]
   },
   daily_units: {
     time: 'iso8601',
     sunrise: 'iso8601',
-    sunset: 'iso8601',
+    sunset: 'iso8601'
   },
   daily: {
     time: [
@@ -178,128 +178,128 @@ const SAMPLE = {
       '2024-10-08',
       '2024-10-09',
       '2024-10-10',
-      '2024-10-11',
+      '2024-10-11'
     ],
     sunrise: [
       '2024-10-07T07:15',
       '2024-10-08T07:16',
       '2024-10-09T07:17',
       '2024-10-10T07:18',
-      '2024-10-11T07:19',
+      '2024-10-11T07:19'
     ],
     sunset: [
       '2024-10-07T19:00',
       '2024-10-08T18:58',
       '2024-10-09T18:57',
       '2024-10-10T18:55',
-      '2024-10-11T18:54',
-    ],
-  },
-};
+      '2024-10-11T18:54'
+    ]
+  }
+}
 
 function n(num: number): number {
-  return Math.ceil(num);
+  return Math.ceil(num)
 }
 
 export function Weather({
-  weatherAtLocation = SAMPLE,
+  weatherAtLocation = SAMPLE
 }: {
-  weatherAtLocation?: WeatherAtLocation;
+  weatherAtLocation?: WeatherAtLocation
 }) {
   const currentHigh = Math.max(
-    ...weatherAtLocation.hourly.temperature_2m.slice(0, 24),
-  );
+    ...weatherAtLocation.hourly.temperature_2m.slice(0, 24)
+  )
   const currentLow = Math.min(
-    ...weatherAtLocation.hourly.temperature_2m.slice(0, 24),
-  );
+    ...weatherAtLocation.hourly.temperature_2m.slice(0, 24)
+  )
 
   const isDay = isWithinInterval(new Date(weatherAtLocation.current.time), {
     start: new Date(weatherAtLocation.daily.sunrise[0]),
-    end: new Date(weatherAtLocation.daily.sunset[0]),
-  });
+    end: new Date(weatherAtLocation.daily.sunset[0])
+  })
 
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+      setIsMobile(window.innerWidth < 768)
+    }
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    handleResize()
+    window.addEventListener('resize', handleResize)
 
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
-  const hoursToShow = isMobile ? 5 : 6;
+  const hoursToShow = isMobile ? 5 : 6
 
   // Find the index of the current time or the next closest time
   const currentTimeIndex = weatherAtLocation.hourly.time.findIndex(
-    (time) => new Date(time) >= new Date(weatherAtLocation.current.time),
-  );
+    time => new Date(time) >= new Date(weatherAtLocation.current.time)
+  )
 
   // Slice the arrays to get the desired number of items
   const displayTimes = weatherAtLocation.hourly.time.slice(
     currentTimeIndex,
-    currentTimeIndex + hoursToShow,
-  );
+    currentTimeIndex + hoursToShow
+  )
   const displayTemperatures = weatherAtLocation.hourly.temperature_2m.slice(
     currentTimeIndex,
-    currentTimeIndex + hoursToShow,
-  );
+    currentTimeIndex + hoursToShow
+  )
 
   return (
     <div
       className={cx(
         'flex flex-col gap-4 rounded-2xl p-4 skeleton-bg max-w-[500px]',
         {
-          'bg-blue-400': isDay,
+          'bg-blue-400': isDay
         },
         {
-          'bg-indigo-900': !isDay,
-        },
+          'bg-indigo-900': !isDay
+        }
       )}
     >
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-row gap-2 items-center">
+      <div className='flex flex-row justify-between items-center'>
+        <div className='flex flex-row gap-2 items-center'>
           <div
             className={cx(
               'size-10 rounded-full skeleton-div',
               {
-                'bg-yellow-300': isDay,
+                'bg-yellow-300': isDay
               },
               {
-                'bg-indigo-100': !isDay,
-              },
+                'bg-indigo-100': !isDay
+              }
             )}
           />
-          <div className="text-4xl font-medium text-blue-50">
+          <div className='text-4xl font-medium text-blue-50'>
             {n(weatherAtLocation.current.temperature_2m)}
             {weatherAtLocation.current_units.temperature_2m}
           </div>
         </div>
 
-        <div className="text-blue-50">{`H:${n(currentHigh)}° L:${n(currentLow)}°`}</div>
+        <div className='text-blue-50'>{`H:${n(currentHigh)}° L:${n(currentLow)}°`}</div>
       </div>
 
-      <div className="flex flex-row justify-between">
+      <div className='flex flex-row justify-between'>
         {displayTimes.map((time, index) => (
-          <div key={time} className="flex flex-col items-center gap-1">
-            <div className="text-blue-100 text-xs">
+          <div key={time} className='flex flex-col items-center gap-1'>
+            <div className='text-blue-100 text-xs'>
               {format(new Date(time), 'ha')}
             </div>
             <div
               className={cx(
                 'size-6 rounded-full skeleton-div',
                 {
-                  'bg-yellow-300': isDay,
+                  'bg-yellow-300': isDay
                 },
                 {
-                  'bg-indigo-200': !isDay,
-                },
+                  'bg-indigo-200': !isDay
+                }
               )}
             />
-            <div className="text-blue-50 text-sm">
+            <div className='text-blue-50 text-sm'>
               {n(displayTemperatures[index])}
               {weatherAtLocation.hourly_units.temperature_2m}
             </div>
@@ -307,5 +307,5 @@ export function Weather({
         ))}
       </div>
     </div>
-  );
+  )
 }
