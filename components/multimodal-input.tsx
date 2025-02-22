@@ -185,6 +185,7 @@ function PureMultimodalInput({
     [setAttachments]
   )
 
+  const isComposingRef = useRef(false)
   return (
     <div className='relative w-full flex flex-col gap-4'>
       {messages.length === 0 &&
@@ -233,10 +234,20 @@ function PureMultimodalInput({
         )}
         rows={2}
         autoFocus
+        onCompositionStart={() => {
+          isComposingRef.current = true
+        }}
+        onCompositionEnd={() => {
+          setTimeout(() => {
+            isComposingRef.current = false
+          }, 0)
+        }}
         onKeyDown={event => {
           if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
-
+            if (isComposingRef.current) {
+              return
+            }
             if (isLoading) {
               toast.error('Please wait for the model to finish its response!')
             } else {

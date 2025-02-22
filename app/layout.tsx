@@ -3,6 +3,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Toaster } from 'sonner'
 import { ThemeProvider } from '@/components/theme-provider'
+import { GeistSans } from 'geist/font/sans'
+import { GeistMono } from 'geist/font/mono'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ai.shu.nu'),
@@ -46,6 +48,7 @@ export default async function RootLayout({
       // prop is necessary to avoid the React hydration mismatch warning.
       // https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
       suppressHydrationWarning
+      className={`antialiased ${GeistSans.variable} ${GeistMono.variable}`}
     >
       <head>
         <script
@@ -54,7 +57,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className='antialiased'>
+      <body>
         <ThemeProvider
           attribute='class'
           defaultTheme='system'
