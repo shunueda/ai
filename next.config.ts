@@ -1,17 +1,8 @@
 import type { NextConfig } from 'next'
 
-const nextConfig: NextConfig = {
+export default {
   experimental: {
-    ppr: true,
-    typedEnv: true
-  },
-  images: {
-    remotePatterns: [
-      {
-        hostname: 'avatar.vercel.sh'
-      }
-    ]
+    typedEnv: true,
+    typedRoutes: true
   }
-}
-
-export default nextConfig
+} satisfies NextConfig
